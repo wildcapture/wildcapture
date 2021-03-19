@@ -92,7 +92,7 @@ export default class DracosisPlayer {
                 // TODO: handle our inconsecutive frames loading, now i assume that all previous frames are loaded
                 const bufferingSize = this.frameRate * 2;
                 const bufferedEnough = this.meshBuffer.getPos() > (this.currentKeyframe+bufferingSize);
-                const bufferedCompletely = frameData.keyframeBufferObject.keyframeNumber === this.numberOfKeyframes;
+                const bufferedCompletely = frameData.keyframeBufferObject.keyframeNumber >= (this.numberOfKeyframes - 1);
                 if (this._debugLevel > 0) {
                     console.log('...buffering +', frameData.keyframeBufferObject.keyframeNumber - this.currentKeyframe, ' ... ', frameData.keyframeBufferObject.keyframeNumber, ' / ', this.numberOfKeyframes);
                 }
