@@ -3,7 +3,7 @@
 export function workerFunction() {
     //@ts-ignore
     importScripts(location.origin + '/corto/corto.js', location.origin + '/corto/rangeFetcher.js');
-    const activeDataLoadsLimit = 10;
+    const activeDataLoadsLimit = 100;
     var self = this;
     let _meshFilePath;
     let currentKeyframe = 0;

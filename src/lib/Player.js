@@ -38,6 +38,7 @@ export default class DracosisPlayer {
     constructor({ scene, renderer, meshFilePath, videoFilePath, frameRate = 25, loop = true, autoplay = true, scale = 1, keyframesToBufferBeforeStart = 200 }) {
         this._debugLevel = 0;
         // Public Fields
+        this.prebufferingLengthInSeconds = 10;
         this.frameRate = 30;
         this.speed = 1.0; // Multiplied by framerate for final playback output rate
         // Private Fields
@@ -90,7 +91,7 @@ export default class DracosisPlayer {
             this.meshBuffer.add({ ...frameData.keyframeBufferObject, bufferGeometry: geometry });
             if (this._status === "buffering") {
                 // TODO: handle our inconsecutive frames loading, now i assume that all previous frames are loaded
-                const bufferingSize = this.frameRate * 2;
+                const bufferingSize = this.frameRate * this.prebufferingLengthInSeconds;
                 const bufferedEnough = this.meshBuffer.getPos() > (this.currentKeyframe+bufferingSize);
                 const bufferedCompletely = frameData.keyframeBufferObject.keyframeNumber === this.numberOfKeyframes;
                 if (this._debugLevel > 0) {
@@ -293,7 +294,7 @@ export default class DracosisPlayer {
      * @param now
      */
     videoAnimationFrame(now) {
-        const keyFrame = Math.round(this._video.currentTime * this.frameRate);
+        const keyFrame = Math.floor(this._video.currentTime * this.frameRate);
         if (keyFrame === this.currentKeyframe) {
             // same keyframe, skip videoUpdateHandler, re-requestNextAnimationFrame
             this.requestVideoFrameCallback();
@@ -318,7 +319,7 @@ export default class DracosisPlayer {
         if (!this._isinitialized)
             return console.warn("videoUpdateHandler: player is not initialized");
 
-        let frameToPlay = Math.round(metadata.mediaTime * this.frameRate);
+        let frameToPlay = Math.floor(metadata.mediaTime * this.frameRate);
         if (this._debugLevel > 0) {
             console.log("Frame to play is", frameToPlay);
         }
@@ -326,9 +327,9 @@ export default class DracosisPlayer {
         if (!this._video){
             return
         }
-        if (Math.round(this._video.currentTime * this.frameRate) !== metadata.presentedFrames) {
+        if (Math.floor(this._video.currentTime * this.frameRate) !== metadata.presentedFrames) {
             if (this._debugLevel > 0) {
-                console.log('==========DIFF', Math.round(this._video.currentTime * this.frameRate), Math.round(metadata.mediaTime * this.frameRate), metadata.presentedFrames, metadata);
+                console.log('==========DIFF', Math.floor(this._video.currentTime * this.frameRate), Math.round(metadata.mediaTime * this.frameRate), metadata.presentedFrames, metadata);
             }
         }
         let hasKeyframe = true;
